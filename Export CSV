@@ -1,0 +1,39 @@
+private void btnExportCsv_Click(object sender, EventArgs e)
+{
+    try
+    {
+        using (var context = new MebeluveikalsDbContext())
+        {
+            var furnitures = context.Furnitures.ToList();
+            if (furnitures.Any())
+            {
+                using (var sfd = new SaveFileDialog { Filter = "CSV files (*.csv)|*.csv", FileName = "FurnitureExport.csv" })
+                {
+                    if (sfd.ShowDialog() == DialogResult.OK)
+                    {
+                        using (var writer = new StreamWriter(sfd.FileName))
+                        {
+                            // Rakstām CSV galveni
+                            writer.WriteLine("Id,Name,Description,Price");
+
+                            // Rakstām datus
+                            foreach (var furniture in furnitures)
+                            {
+                                writer.WriteLine($"{furniture.Id},{furniture.Name},{furniture.Description},{furniture.Price}");
+                            }
+                        }
+                        MessageBox.Show("Dati veiksmīgi eksportēti.", "Eksports pabeigts", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Nav datu eksportēšanai.", "Eksports", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show($"Kļūda eksportējot datus: {ex.Message}", "Kļūda", MessageBoxButtons.OK, MessageBoxIcon.Error);
+    }
+}
